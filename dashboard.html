@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Bot</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-image: url("https://img.freepik.com/free-vector/red-movie-theater-seats-with-curtains-background_1017-38388.jpg");
+    background-repeat: no-repeat;
+    background-size: 1500px 2000px;
+    width:1000px;
+  }
+
+  #chat-container {
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 100px;
+    max-height: 400px;
+    margin-left: 200px;
+   
+  }
+
+  .movie-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 30px;
+   width:700px;
+  }
+
+  .movie-card h2 {
+    font-size: 25px;
+    color: #ccc;
+  }
+  .movie-card p {
+    margin :5px 0 ;
+    font-size: 16px;
+    color: whitesmoke;
+    }
+  .movie-card img { 
+   height: 310px;
+   width: 200px;
+    margin-left: 470px;
+    margin-top: -300px;
+    border-radius: 10px;
+    border: 2px solid white;
+    
+   
+}
+.movie-card h5{
+    background-color: black;
+    color: whitesmoke;
+    width: 50px;
+    height: 40px;
+    padding-left: 5px;
+    padding-top: 15px;
+   border: 5px solid whitesmoke;
+   border-radius: 100px;
+}
+
+  .edit-button,
+  .delete-button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 30px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .edit-button {
+    margin-right: 5px;
+  }
+
+  .edit-button:hover,
+  .delete-button:hover {
+    background-color: #0056b3;
+  }
+
+  #input-field {
+    width: 60%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+  }
+
+  #search-button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  #search-button:hover {
+    background-color: #0056b3;
+  }
+ #p{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 550px;
+    margin-right:-150px ;
+ }
+ #p1{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100px;
+    padding: 5px ;
+    margin-top: -100px;
+ }
+ h1{
+    color: whitesmoke;
+ }
+ 
+</style></head>
+<body>
+    <div id="p">
+        <div id="p1">
+  <div id="chat-container"><h1><u> <em>MOVIE BOT</em></u></h1>
+  <input type="text" id="input-field" placeholder="Enter a movie title">
+  <button id="search-button">Search</button></div></div></div>
+  <br><br>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    var chatContainer = document.getElementById('chat-container');
+    var inputField = document.getElementById('input-field');
+    var searchButton = document.getElementById('search-button');
+
+    searchButton.addEventListener('click', function() {
+      var movieTitle = inputField.value.trim();
+
+      if (movieTitle !== '') {
+        fetchMovieDetails(movieTitle)
+          .then(function(data) {
+            if (data.Response === 'True') {
+              var movieId = generateUniqueId();
+              createMovieCard(movieId, data);
+              saveMovieDetails(movieId, data);
+            } else {
+              sendMessage('Movie not found');
+            }
+          })
+          .catch(function(error) {
+            console.error(error);
+            sendMessage('An error occurred while fetching movie details');
+          });
+
+        inputField.value = '';
+      }
+    });
+
+    function fetchMovieDetails(title) {
+      var url = 'https://www.omdbapi.com/?t=' + encodeURIComponent(title) + '&apikey=dc80035c';
+
+      return fetch(url)
+        .then(function(response) {
+          return response.json();
+        });
+    }
+
+
+    function createMovieCard(movieId, movieData) {
+      var cardContainer = document.createElement('div');
+      cardContainer.id = movieId;
+      cardContainer.className = 'movie-card';
+
+      var titleElement = createCardElement('h2', 'Title: ' + movieData.Title);
+      cardContainer.appendChild(titleElement);
+      var actorsElement = createCardElement('p', 'Actors: ' + movieData.Actors);
+      cardContainer.appendChild(actorsElement);
+      var directorElement = createCardElement('p', 'Director: ' + movieData.Director);
+      cardContainer.appendChild(directorElement);
+      var writerElement = createCardElement('p', 'Writer: ' + movieData.Writer);
+      cardContainer.appendChild(writerElement);
+       var releaseDateElement = createCardElement('p', 'Release Date: ' + movieData.Released);
+      cardContainer.appendChild(releaseDateElement);
+
+      var runtimeElement = createCardElement('p', 'Runtime: ' + movieData.Runtime);
+      cardContainer.appendChild(runtimeElement);
+     var ratingElement = createCardElement('h5', 'Rating:- ' + movieData.Ratings[0].Value);
+      cardContainer.appendChild(ratingElement);
+
+     
+  
+  var editButton = createCardButton('Report change', function() {
+        editMovieCard(movieId, movieData);
+      });
+      cardContainer.appendChild(editButton);
+
+      var deleteButton = createCardButton('Delete', function() {
+        deleteMovieCard(movieId);
+      });
+      cardContainer.appendChild(deleteButton);
+
+      chatContainer.appendChild(cardContainer);
+      var posterElement = createCardElement('img', '');
+  posterElement.setAttribute('src', movieData.Poster);
+  posterElement.setAttribute('alt', 'Movie Poster');
+  cardContainer.appendChild(posterElement);
+
+     
+    }
+
+    function createCardElement(tagName, text) {
+      var element = document.createElement(tagName);
+      element.textContent = text;
+      return element;
+    }
+
+    function createCardButton(text, clickHandler) {
+      var button = document.createElement('button');
+      button.textContent = text;
+      button.className = 'edit-button';
+      button.addEventListener('click', clickHandler);
+      return button;
+    }
+    
+
+    function editMovieCard(movieId, movieData) {
+      var cardContainer = document.getElementById(movieId);
+      cardContainer.innerHTML = '';
+
+      var titleInput = createEditInput('Title', movieData.Title);
+      cardContainer.appendChild(titleInput);
+
+      var releaseDateInput = createEditInput('Release Date', movieData.Released);
+      cardContainer.appendChild(releaseDateInput);
+
+      var runtimeInput = createEditInput('Runtime', movieData.Runtime);
+      cardContainer.appendChild(runtimeInput);
+
+      var writerInput = createEditInput('Writer', movieData.Writer);
+      cardContainer.appendChild(writerInput);
+
+      var actorsInput = createEditInput('Actors', movieData.Actors);
+      cardContainer.appendChild(actorsInput);
+
+      
+
+      var ratingInput = createEditInput('Rating', movieData.Ratings[0].Value);
+      cardContainer.appendChild(ratingInput);
+
+      var directorInput = createEditInput('Director', movieData.Director);
+      cardContainer.appendChild(directorInput);
+
+      var saveButton = createCardButton('Save', function() {
+        saveMovieCard(movieId);
+      });
+      cardContainer.appendChild(saveButton);
+    }
+
+    function createEditInput(labelText, value) {
+      var inputContainer = document.createElement('div');
+
+      var label = document.createElement('label');
+      label.textContent = labelText + ': ';
+      inputContainer.appendChild(label);
+
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.value = value;
+      inputContainer.appendChild(input);
+
+      return inputContainer;
+    }
+
+    function saveMovieCard(movieId) {
+      var cardContainer = document.getElementById(movieId);
+      var inputFields = cardContainer.getElementsByTagName('input');
+
+      var movieData = {
+        Title: inputFields[0].value,
+        Released: inputFields[1].value,
+        Runtime: inputFields[2].value,
+        Writer: inputFields[3].value,
+        Actors: inputFields[4].value,
+        Plot: inputFields[5].value,
+        Ratings: [{ Value: inputFields[6].value }],
+        Director: inputFields[7].value
+      };
+
+      saveMovieDetails(movieId, movieData);
+      createMovieCard(movieId, movieData);
+    }
+
+    function deleteMovieCard(movieId) {
+      var cardContainer = document.getElementById(movieId);
+      cardContainer.remove();
+      deleteMovieDetails(movieId);
+    }
+
+    function saveMovieDetails(movieId, movieData) {
+      var savedMovies = getSavedMovies();
+      savedMovies[movieId] = movieData;
+      localStorage.setItem('movieDetails', JSON.stringify(savedMovies));
+    }
+
+    function deleteMovieDetails(movieId) {
+      var savedMovies = getSavedMovies();
+      delete savedMovies[movieId];
+      localStorage.setItem('movieDetails', JSON.stringify(savedMovies));
+    }
+
+    function getSavedMovies() {
+      var savedMovies = localStorage.getItem('movieDetails');
+      return savedMovies ? JSON.parse(savedMovies) : {};
+    }
+
+    function loadSavedMovieDetails() {
+      var savedMovies = getSavedMovies();
+
+      for (var movieId in savedMovies) {
+        if (savedMovies.hasOwnProperty(movieId)) {
+          createMovieCard(movieId, savedMovies[movieId]);
+        }
+      }
+    }
+
+    function generateUniqueId() {
+      return 'movie-' + Date.now();
+    }
+
+    function sendMessage(message) {
+      var messageElement = document.createElement('p');
+      messageElement.textContent = message;
+      chatContainer.appendChild(messageElement);
+      
+    }
+
+    loadSavedMovieDetails();
+  });
+
+
+  </script>
+</body>
+</html>
