@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title>Login</title>
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -20,7 +20,7 @@
             color: #333;
             font-size: 30px;
         }
-        .container{
+        .container {
             background-color: #ffffff;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -28,14 +28,13 @@
             width: 320px;
             box-shadow: -10px -10px 15px black;
         }
-        a{
-            color:   #007BFF;
+        a {
+            color: #007BFF;
         }
         label {
             display: block;
             margin-bottom: 5px;
             color: #555;
-            
         }
         button {
             background-color: #007BFF;
@@ -50,29 +49,29 @@
         button:hover {
             background-color: #0056b3;
         }
-        .box{
+        .box {
             width: 90%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 3px;
             font-size: 16px;
         }
- 
     </style>
 </head>
 <body>
     <div class="container">
-    <h2>Login</h2><br>
-    <form action="/loginSubmit" method="post">
-        <div class="container2">
-        <label>Email id</label><br><input class="box" type="text" name="email"><br><br>
-        <label>Password</label><br><input class="box" type="password" name="pwd"><br><br>
-        <input  type="checkbox">Stay Signed in<br><br>
-        <button onclick="login()">Login</button><br><br>
-        <a href="">Forget Password...?</a><br><br>
-        </div>
-    </form>
+        <h2>Login</h2><br>
+        <form action="/loginSubmit" method="post">
+            <div class="container2">
+                <label>Email id</label><br>
+                <input class="box" type="text" name="email"><br><br>
+                <label>Password</label><br>
+                <input class="box" type="password" name="pwd"><br><br>
+                <input type="checkbox">Stay Signed in<br><br>
+                <button type="submit">Login</button><br><br>
+                <a href="">Forget Password...?</a><br><br>
+            </div>
+        </form>
     </div>
-    
 </body>
 </html>
